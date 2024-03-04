@@ -1,21 +1,50 @@
-import articles from '../data/data.json';
+// import articles from "../data/data.json";
 
-const LOAD_ARTICLES = 'article/loadArticles';
-const ADD_ARTICLE = 'article/addArticle';
+const LOAD_ARTICLES = "article/loadArticles";
+const ADD_ARTICLE = "article/addArticle";
 
-export const loadArticles = () => {
+export const loadArticles = (articles) => {
   return {
     type: LOAD_ARTICLES,
-    articles
+    articles,
   };
 };
 
 export const addArticle = (article) => {
   return {
     type: ADD_ARTICLE,
-    article
+    article,
   };
 };
+
+export function writeArticle(article) {
+  article = JSON.stringify(article);
+  return async (dispatch) => {
+    const response = await fetch("api/articles", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: article,
+    });
+
+    if (response.ok) {
+      const payload = await response.json();
+      dispatch(addArticle(payload));
+    }
+  };
+}
+
+export function fetchArticles() {
+  return async (dispatch) => {
+    const response = await fetch("/api/articles");
+
+    if (response.ok) {
+      const articles = await response.json();
+      dispatch(loadArticles(articles));
+    }
+  };
+}
 
 const initialState = { entries: [], isLoading: true };
 
